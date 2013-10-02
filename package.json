@@ -1,0 +1,12 @@
+{
+    "name": "camden.htmlescaper",
+    "title": "HTMLEscaper",
+    "description": "Adds a panel that shows an escaped version of the HTML.",
+    "homepage": "https://github.com/cfjedimaster/brackets-htmlescaper",
+    "version": "1.0.0",
+    "author": "Raymond Camden <raymondcamden@gmail.com> (http://www.raymondcamden.com)",
+    "license": "MIT",
+    "engines": {
+        "brackets": ">=0.31.0"
+    }
+}
