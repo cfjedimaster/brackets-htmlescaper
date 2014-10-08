@@ -11,6 +11,7 @@ define(function (require, exports, module) {
 		CommandManager          = brackets.getModule("command/CommandManager"),
 		EditorManager           = brackets.getModule("editor/EditorManager"),
 		DocumentManager         = brackets.getModule("document/DocumentManager"),
+		MainViewManager			= brackets.getModule("view/MainViewManager"),
 		ExtensionUtils          = brackets.getModule("utils/ExtensionUtils"),
 		Menus                   = brackets.getModule("command/Menus"),
 		PanelManager            = brackets.getModule("view/PanelManager"),
@@ -26,28 +27,26 @@ define(function (require, exports, module) {
 	var $htmlescaper;
 
 	function handleEscape() {
+		console.log("run handleEscape");
 		var text;
 
-		var editor = EditorManager.getFocusedEditor();
-		if(!editor) return;
-
-		//Debating if I want to support selects - I think I'll wait...
-		/*
-		var selectedText = editor && editor.getSelectedText();
-		if (selectedText) {
-			text = selectedText;
-		} else if(editor.document) {
-			text = editor.document.getText();
+		var activePanelId = MainViewManager.getActivePaneId();
+		var currentFile = MainViewManager.getCurrentlyViewedFile(activePanelId);
+		if(!currentFile) {
+			_handleShowPanel();
+			return;
 		}
-		*/
-		text = editor.document.getText();
 
+		currentFile.read(function(err, text, stats) {
+			console.log("callback for read");
 
-		$htmlescaper.show();
-		CommandManager.get(VIEW_HIDE_HTMLESCAPER).setChecked(true);
+			$htmlescaper.show();
+			CommandManager.get(VIEW_HIDE_HTMLESCAPER).setChecked(true);
 
-		var escapeText = HTMLEscaper.escape(text);
-		$textareaOutput.val(escapeText);
+			var escapeText = HTMLEscaper.escape(text);
+			$textareaOutput.val(escapeText);
+		});
+
 	}
 
 	function _handleShowPanel() {
@@ -55,14 +54,15 @@ define(function (require, exports, module) {
 		if ($htmlescaper.css("display") === "none") {
 
 			handleEscape();
-            $(DocumentManager).on("currentDocumentChange documentSaved", handleEscape);
-
+            $(DocumentManager).on("documentSaved", handleEscape);
+            $(MainViewManager).on("currentFileChange", handleEscape);
 
 		} else {
 			$htmlescaper.hide();
 			CommandManager.get(VIEW_HIDE_HTMLESCAPER).setChecked(false);
 			EditorManager.focusEditor();
-            $(DocumentManager).off("currentDocumentChange documentSaved", handleEscape);
+            $(DocumentManager).off("documentSaved", handleEscape);
+            $(MainViewManager).off("currentFileChange", handleEscape);
 		}
 
 		EditorManager.resizeEditor();
