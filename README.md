@@ -2,7 +2,7 @@ HTMLEscaper Extension
 =================
 
 This extension simply provides a web-safe version of the current document. I use it
-for blog entries.
+for blog entries or any case when I need to create HTML-safe versions of code.
 
 History
 =======
